@@ -17,6 +17,7 @@ package org.apache.zeppelin.jdbc;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -232,7 +233,20 @@ public class JDBCInterpreter extends Interpreter {
     if (connection == null) {
       return null;
     }
+    
 
+    CallableStatement stm = null;
+    String query = "{call pack_context.contextid_open(?)} ";
+    try {
+      stm = connection.prepareCall(query);
+      int id = 22;
+      stm.setInt(1, id);
+      stm.execute();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    
     Statement statement = connection.createStatement();
     if (isStatementClosed(statement)) {
       connection = getConnection(propertyKey);

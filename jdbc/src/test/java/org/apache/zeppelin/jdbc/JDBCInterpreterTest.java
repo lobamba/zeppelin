@@ -51,13 +51,35 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     }
     return jdbcConnection;
   }
-
+/*
   public static Properties getJDBCTestProperties() {
     Properties p = new Properties();
     p.setProperty("default.driver", "org.postgresql.Driver");
     p.setProperty("default.url", "jdbc:postgresql://localhost:5432/");
     p.setProperty("default.user", "gpadmin");
     p.setProperty("default.password", "");
+    p.setProperty("common.max_count", "1000");
+
+    return p;
+  }*/
+  
+  public static Properties getJDBCTestProperties() {
+    Properties p = new Properties();
+    p.setProperty("default.driver", "oracle.jdbc.driver.OracleDriver");
+    p.setProperty("default.url", "jdbc:oracle:thin:@fgr-lgcibdb201:1521/shortd");
+    p.setProperty("default.user", "bubbleci");
+    p.setProperty("default.password", "a");
+    p.setProperty("common.max_count", "1000");
+
+    return p;
+  }
+  
+  public static Properties getJDBCTestPropertiesMaci() {
+    Properties p = new Properties();
+    p.setProperty("default.driver", "oracle.jdbc.driver.OracleDriver");
+    p.setProperty("default.url", "jdbc:oracle:thin:@LHR-LBINTDB101:1521/longa_pdb1");
+    p.setProperty("default.user", "maci");
+    p.setProperty("default.password", "a");
     p.setProperty("common.max_count", "1000");
 
     return p;
@@ -124,7 +146,7 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     assertEquals(InterpreterResult.Code.ERROR, interpreterResult.code());
     assertEquals("Prefix not found.", interpreterResult.message());
   }
-  
+ /* 
   @Test
   public void testDefaultProperties() throws SQLException {
     JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestProperties());
@@ -134,7 +156,33 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     assertEquals("gpadmin", jdbcInterpreter.getProperty(DEFAULT_USER));
     assertEquals("", jdbcInterpreter.getProperty(DEFAULT_PASSWORD));
     assertEquals("1000", jdbcInterpreter.getProperty(COMMON_MAX_LINE));
+  }*/
+  
+  
+  
+  @Test
+  public void testjdbc() throws SQLException {
+    JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestProperties());
+    
+    
+    String s = jdbcInterpreter.getProperty(DEFAULT_DRIVER) + " et " + jdbcInterpreter.getProperty(DEFAULT_URL);
+    assertEquals("oracle.jdbc.driver.OracleDriver", jdbcInterpreter.getProperty(DEFAULT_DRIVER));
+    assertEquals("jdbc:oracle:thin:@fgr-lgcibdb201:1521/shortd", jdbcInterpreter.getProperty(DEFAULT_URL));
+    assertEquals("bubbleci", jdbcInterpreter.getProperty(DEFAULT_USER));
+    assertEquals("a", jdbcInterpreter.getProperty(DEFAULT_PASSWORD));
+    assertEquals("1000", jdbcInterpreter.getProperty(COMMON_MAX_LINE));
+    jdbcInterpreter.open();
+    String sqlQuery = "select * from sii_cfl where rownum < 10";
+
+    InterpreterResult interpreterResult = jdbcInterpreter.interpret(sqlQuery, new InterpreterContext("", "1", "", "", null, null, null, null, null, null, null));
+
+    assertEquals(InterpreterResult.Code.SUCCESS, interpreterResult.code());
+    assertEquals(InterpreterResult.Type.TABLE, interpreterResult.type());
   }
+  
+  
+  //test maci, avec  les appels de fonctions
+  
   
   @Test
   public void testSelectQuery() throws SQLException, IOException {
