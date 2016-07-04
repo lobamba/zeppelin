@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.zeppelin.interpreter.Interpreter;
@@ -82,6 +83,7 @@ public class JDBCInterpreter extends Interpreter {
   static final String URL_KEY = "url";
   static final String USER_KEY = "user";
   static final String PASSWORD_KEY = "password";
+  static final String CONTEXT_KEY = "context";
   static final String DOT = ".";
 
   private static final char WHITESPACE = ' ';
@@ -97,6 +99,7 @@ public class JDBCInterpreter extends Interpreter {
   static final String DEFAULT_URL = DEFAULT_KEY + DOT + URL_KEY;
   static final String DEFAULT_USER = DEFAULT_KEY + DOT + USER_KEY;
   static final String DEFAULT_PASSWORD = DEFAULT_KEY + DOT + PASSWORD_KEY;
+  static final String DEFAULT_CONTEXT = DEFAULT_KEY + DOT + CONTEXT_KEY;
 
   static final String EMPTY_COLUMN_VALUE = "";
 
@@ -171,7 +174,7 @@ public class JDBCInterpreter extends Interpreter {
     for (String propertyKey : propertiesMap.keySet()) {
       try {
         connection = getConnection(propertyKey);
-        sqlCompleter = createSqlCompleter(connection);
+       // sqlCompleter = createSqlCompleter(connection);
       } catch (Exception e) {
         sqlCompleter = createSqlCompleter(null);
       }
@@ -234,18 +237,24 @@ public class JDBCInterpreter extends Interpreter {
       return null;
     }
     
+    Properties p = propertiesMap.get(propertyKey);
+    String x = p.getProperty(CONTEXT_KEY);
+    if (x != null){
+      CallableStatement stm = null;
+      String query = "{call pack_context.contextid_open(?)} ";
+      try {
+        
+        stm = connection.prepareCall(query);
+        
+        stm.setString(1, x);
+       // stm.setInt(1, id);
+        stm.execute();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
 
-    CallableStatement stm = null;
-    String query = "{call pack_context.contextid_open(?)} ";
-    try {
-      stm = connection.prepareCall(query);
-      int id = 22;
-      stm.setInt(1, id);
-      stm.execute();
-    } catch (Exception e) {
-      e.printStackTrace();
     }
-
+    
     
     Statement statement = connection.createStatement();
     if (isStatementClosed(statement)) {

@@ -66,16 +66,16 @@
     <module>zeppelin-interpreter</module>
     <module>zeppelin-zengine</module>
     <module>zeppelin-display</module>
-  <!--   <module>spark-dependencies</module>
+   <!-- <module>spark-dependencies</module>
     <module>spark</module>
-   <module>markdown</module>
+    <module>markdown</module>
     <module>angular</module>
     <module>shell</module>
     <module>livy</module>
-    <module>hbase</module>-->
-    <module>postgresql</module>
+    <module>hbase</module>
+    <module>postgresql</module>-->
     <module>jdbc</module>
-  <!--  <module>file</module>
+    <!--<module>file</module>
     <module>flink</module>
     <module>ignite</module>
     <module>kylin</module>
@@ -107,7 +107,7 @@
 
 	    <dependency>
       <groupId>com.oracle</groupId>
-      <artifactId>ojdbc6</artifactId>
+      <artifactId>ojdbc7</artifactId>
       <version>12.1.0.2.0</version>
 	  </dependency>
 	  
