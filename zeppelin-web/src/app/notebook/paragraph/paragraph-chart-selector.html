@@ -16,6 +16,12 @@ limitations under the License.
      style='margin-bottom: 10px;'>
   <div id="{{paragraph.id}}_switch"
        class="btn-group">
+	<a href="http://www.w3schools.com/">
+	<button type="button" class="btn btn-default btn-sm"
+			ng-class="{'active': isGraphMode('multiBarChart')}"
+			ng-click="setGraphMode('multiBarChart', true)">
+			test
+	</button> </a>
     <button type="button" class="btn btn-default btn-sm"
             ng-class="{'active': isGraphMode('table')}"
             ng-click="setGraphMode('table', true)" ><i class="fa fa-table"></i>

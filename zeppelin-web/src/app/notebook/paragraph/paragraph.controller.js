@@ -96,6 +96,19 @@ angular.module('zeppelinWebApp')
     $scope.colWidthOption = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
     $scope.showTitleEditor = false;
     $scope.paragraphFocused = false;
+    $scope.booleen = false;
+    $scope.userselected = null;
+    $scope.arrlist = [{
+  	  'userid': 1,
+  	  'name': 'Suresh'
+  	  }, {
+  	  'userid': 2,
+  	  'name': 'Rohini'
+  	  }, {
+  	  'userid': 3,
+  	  'name': 'Praveen'
+  	  }];
+    //$scope.userselected = $scope.arrlist;
     if (newParagraph.focus) {
       $scope.paragraphFocused = true;
     }
@@ -109,6 +122,7 @@ angular.module('zeppelinWebApp')
     if ($scope.getResultType() === 'TABLE') {
       $scope.loadTableData($scope.paragraph.result);
       $scope.setGraphMode($scope.getGraphMode(), false, false);
+      $scope.dataFilter = $scope.paragraph.result;
     } else if ($scope.getResultType() === 'HTML') {
       $scope.renderHtml();
     } else if ($scope.getResultType() === 'ANGULAR') {
@@ -402,6 +416,7 @@ angular.module('zeppelinWebApp')
       $scope.paragraph.status = data.paragraph.status;
       $scope.paragraph.result = data.paragraph.result;
       $scope.paragraph.settings = data.paragraph.settings;
+      $scope.changeDataView = false;
 
       if (!$scope.asIframe) {
         $scope.paragraph.config = data.paragraph.config;
@@ -1185,7 +1200,33 @@ angular.module('zeppelinWebApp')
     }
   };
 
-  $scope.setGraphMode = function(type, emit, refresh) {
+
+	   
+	  $scope.getdetails = function () {
+	  if($scope.userselected.userid === '2'){
+		  $scope.result = true;  
+	  }
+	  else{
+		  $scope.result = false;  
+	  }
+	  
+	  };
+	
+	  
+	$scope.setResultData = function(param){
+		
+		alert(param);
+		
+		
+		
+		
+	  };
+  
+  
+  $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
+	 
+	 //var test = filter();
+	  
     if (emit) {
       setNewMode(type);
     } else {
@@ -1193,12 +1234,16 @@ angular.module('zeppelinWebApp')
       // set graph height
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_graph').height(height);
-
+      //si fitre=oui, on change la valeur de result
+      var res = paragraphResult(estFiltre, nomFiltre);
       if (!type || type === 'table') {
-        setTable($scope.paragraph.result, refresh);
+        setTable(res, refresh);
       }
       else {
-        setD3Chart(type, $scope.paragraph.result, refresh);
+        setD3Chart(type, res, refresh);
+      }
+      if(estFiltre){
+    	  $scope.loadTableData($scope.dataFilter);
       }
     }
   };
@@ -1217,12 +1262,12 @@ angular.module('zeppelinWebApp')
     websocketMsgSrv.commitParagraph($scope.paragraph.id, title, text, config, params);
   };
 
-  var setTable = function(type, data, refresh) {
+  var setTable = function(data, refresh) {
     var renderTable = function() {
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_table').css('height', height);
-      var resultRows = $scope.paragraph.result.rows;
-      var columnNames = _.pluck($scope.paragraph.result.columnNames, 'name');
+      var resultRows = data.rows;//$scope.paragraph.result.rows;
+      var columnNames = _.pluck(data.columnNames, 'name');
       var container = document.getElementById('p' + $scope.paragraph.id + '_table');
 
       var handsontable = new Handsontable(container, {
@@ -1298,13 +1343,58 @@ angular.module('zeppelinWebApp')
     }
     return groupedThousandsWith3DigitsFormatter(d);
   };
+  
+  var setFilter = function(column, value) {
+	  $scope.filter.column = column;
+	  $scope.filter.value = value;
+  };
+  //pour un premier essaie
+  var filter = function(nomfiltre) {
+	
+	  var res = $scope.dataFilter;
+	  var key = res.msgTable[0][0].key;
+	  var saveData = [];
+	  var saveRows= [];
+	  for(var i = 0; i < res.msgTable.length; i++){
+		  var list = res.msgTable[i];
+		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
+			 for(var j = 0; j < list.length; j++){
+				 res.msgTable[i][j].key = key; //on garde la cles des tableau
+			 }  
+			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
+			 saveRows[0] = res.rows[i];
+			  //alert(list[0].value);
+		  }/*else{
+			  res.msgTable[i] = null;
+			  res.rows[i] = null;
+		  }*/
+	  }
+	  res.msgTable = saveData;
+	  res.rows = saveRows;
+	  return res;
+	 // var taille = res.msgTable.length;
+	 // var taille2 = res.rows.length;
+	  
+  };
+  
+  var paragraphResult = function(estfiltre, nomfiltre) {
+	  if (estfiltre) {
+		  var res =  filter(nomfiltre);
+	  	return res;
+	  }  else {
+		  return $scope.paragraph.result;
+	  }
+	  
+  };
+
 
   var setD3Chart = function(type, data, refresh) {
-    if (!$scope.chart[type]) {
+	
+	  if (!$scope.chart[type]) {
       var chart = nv.models[type]();
       $scope.chart[type] = chart;
     }
-
+  
     var d3g = [];
     var xLabels;
     var yLabels;
@@ -1318,7 +1408,7 @@ angular.module('zeppelinWebApp')
 
       $scope.chart[type].xAxis.tickFormat(function(d) {return xAxisTickFormat(d, xLabels);});
       $scope.chart[type].yAxis.tickFormat(function(d) {return xAxisTickFormat(d, yLabels);});
-
+      
       // configure how the tooltip looks.
       $scope.chart[type].tooltipContent(function(key, x, y, graph, data) {
         var tooltipContent = '<h3>' + key + '</h3>';
@@ -1327,7 +1417,7 @@ angular.module('zeppelinWebApp')
           tooltipContent += '<p>' + data.point.size + '</p>';
         }
 
-        return tooltipContent;
+        return tooltipContent; 
       });
 
       $scope.chart[type].showDistX(true)
@@ -1335,26 +1425,72 @@ angular.module('zeppelinWebApp')
       //handle the problem of tooltip not showing when muliple points have same value.
     } else {
       var p = pivot(data);
+      
+      
       if (type === 'pieChart') {
         var d = pivotDataToD3ChartFormat(p, true).d3g;
 
         $scope.chart[type].x(function(d) { return d.label;})
           .y(function(d) { return d.value;});
+        $scope.chart[type].pie.dispatch.on('elementClick', function(d){
+          
+            d3.select('#p'+$scope.paragraph.id+'_'+type+' svg').Refresh(); //fais partir le graph
+           // console.dir(d.point);
+           // alert('ok '  + d[0].values.length );
+        });
+        var test = d3.select('#p'+$scope.paragraph.id+'_'+type+' svg');
+        
 
         if ( d.length > 0 ) {
           for ( var i=0; i<d[0].values.length ; i++) {
             var e = d[0].values[i];
+            
+            
+           /* $scope.chart[type].pie.dispatch.on('elementClick', function(d){
+               
+              //  d3.select('#p'+$scope.paragraph.id+'_'+type+' svg').remove(); //fais partir le graph
+               // console.dir(d.point);
+               
+             //   $scope.chart[type].pie.refresh();
+                var e = d[0].values[0];
+                d3g.push({
+                    label : e.x,
+                    value : e.y
+                  });
+                alert(d.length );
+            });*/
+              
             d3g.push({
               label : e.x,
               value : e.y
             });
           }
+         /* d3g.push({
+              label : d[0].values[0].x,
+              value : d[0].values[0]
+            });
+          */
         }
+       
+        
       } else if (type === 'multiBarChart') {
+    	  if($scope.changeDataView){
+    		  p.rows.kw = null;  
+    	  }
         d3g = pivotDataToD3ChartFormat(p, true, false, type).d3g;
+       
+        //ICIIIIIIIIIIIIIIIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
         $scope.chart[type].yAxis.axisLabelDistance(50);
         $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
+        $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
+            
+            console.dir(d.point);
+            alert('ok ');
+        });
       } else if (type === 'lineChart' || type === 'stackedAreaChart' || type === 'lineWithFocusChart') {
+    	  if($scope.changeDataView){
+    		  p.rows.kw = null;  
+    	  }
         var pivotdata = pivotDataToD3ChartFormat(p, false, true);
         xLabels = pivotdata.xLabels;
         d3g = pivotdata.d3g;

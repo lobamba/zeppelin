@@ -3,7 +3,7 @@
     {
       "title": "Hello R",
       "text": "%r\nfoo \u003c- TRUE\nprint(foo)\nbare \u003c- c(1, 2.5, 4)\nprint(bare)\ndouble \u003c- 15.0\nprint(double)",
-      "dateUpdated": "Feb 23, 2016 2:44:13 PM",
+      "dateUpdated": "Jun 20, 2016 11:20:09 AM",
       "config": {
         "colWidth": 4.0,
         "graph": {
@@ -26,14 +26,15 @@
       "jobName": "paragraph_1429882946244_-381648689",
       "id": "20150424-154226_261270952",
       "result": {
-        "code": "SUCCESS",
+        "code": "ERROR",
         "type": "TEXT",
-        "msg": "[1] TRUE\n[1] 1.0 2.5 4.0\n[1] 15"
+        "msg": "Interpreter r not found"
       },
       "dateCreated": "Apr 24, 2015 3:42:26 PM",
       "dateStarted": "Feb 23, 2016 2:44:13 PM",
       "dateFinished": "Feb 23, 2016 2:44:55 PM",
-      "status": "FINISHED",
+      "status": "ERROR",
+      "errorMessage": "",
       "progressUpdateIntervalMs": 500
     },
     {
@@ -111,7 +112,7 @@
     {
       "title": "HTML Display",
       "text": "%r \n\nprint(\"%html \u003ch3\u003eHello HTML\u003c/h3\u003e\")\nprint(\"\u003cfont color\u003d\u0027blue\u0027\u003e\u003cspan class\u003d\u0027fa fa-bars\u0027\u003e Easy...\u003c/font\u003e\u003c/span\u003e\")\nfor (i in 1:10) {\n  print(paste0(\"\u003ch4\u003e\", i, \" * 2 \u003d \", i*2, \"\u003c/h4\u003e\"))\n}",
-      "dateUpdated": "Feb 23, 2016 2:45:15 PM",
+      "dateUpdated": "Jun 20, 2016 11:43:57 AM",
       "config": {
         "colWidth": 3.0,
         "graph": {
@@ -134,14 +135,15 @@
       "jobName": "paragraph_1456140102445_51059930",
       "id": "20160222-122142_1323614681",
       "result": {
-        "code": "SUCCESS",
-        "type": "HTML",
-        "msg": "\u003cp\u003e\u003c/p\u003e\u003ch3\u003eHello HTML\u003c/h3\u003e\u003cfont color\u003d\"blue\"\u003e\u003cspan class\u003d\"fa fa-bars\"\u003e Easy…\u003c/span\u003e\u003c/font\u003e\u003ch4\u003e1 * 2 \u003d 2\u003c/h4\u003e\u003ch4\u003e2 * 2 \u003d 4\u003c/h4\u003e\u003ch4\u003e3 * 2 \u003d 6\u003c/h4\u003e\u003ch4\u003e4 * 2 \u003d 8\u003c/h4\u003e\u003ch4\u003e5 * 2 \u003d 10\u003c/h4\u003e\u003ch4\u003e6 * 2 \u003d 12\u003c/h4\u003e\u003ch4\u003e7 * 2 \u003d 14\u003c/h4\u003e\u003ch4\u003e8 * 2 \u003d 16\u003c/h4\u003e\u003ch4\u003e9 * 2 \u003d 18\u003c/h4\u003e\u003ch4\u003e10 * 2 \u003d 20\u003c/h4\u003e\u003cp\u003e\u003c/p\u003e"
+        "code": "ERROR",
+        "type": "TEXT",
+        "msg": "Interpreter r not found"
       },
       "dateCreated": "Feb 22, 2016 12:21:42 PM",
       "dateStarted": "Feb 23, 2016 2:45:15 PM",
       "dateFinished": "Feb 23, 2016 2:45:16 PM",
-      "status": "FINISHED",
+      "status": "ERROR",
+      "errorMessage": "",
       "progressUpdateIntervalMs": 500
     },
     {
@@ -322,7 +324,6 @@
     {
       "title": "Write Scala To R",
       "text": "val s \u003d \"Hello R from Scala\"\nz.put(\"s\", s)\nval b \u003d new Integer(42)\nz.put(\"b\", b)\nval a: Array[Double] \u003d Array[Double](30.1, 20.0)\nz.put(\"a\", a)\nval m \u003d Array(Array(1, 4), Array(8, 16))\nz.put(\"m\", m)\nval v \u003d Vector(1, 2, 3, 4)\nz.put(\"v\", v)",
-      "authenticationInfo": {},
       "dateUpdated": "Mar 30, 2016 9:05:07 AM",
       "config": {
         "colWidth": 3.0,
@@ -359,7 +360,6 @@
     {
       "title": "Read from R the Scala Variables",
       "text": "%r\nz.get(\"s\")\nz.get(\"b\")\nprint(unlist(z.get(\"a\")))\nprint(unlist(z.get(\"m\")))\nz.get(\"v\")",
-      "authenticationInfo": {},
       "dateUpdated": "Mar 30, 2016 9:05:08 AM",
       "config": {
         "colWidth": 3.0,
@@ -396,7 +396,6 @@
     {
       "title": "Write R to Scala",
       "text": "%r\ns \u003c- \"Hello Scala from R\"\nprint(s)\nz.put(\"rs\", s)\nb \u003c- TRUE\nprint(b)\nz.put(\"rb\", b)\nd \u003c- 15.0\nprint(d)\nz.put(\"rd\", d)\nm \u003c- c(2.4, 2.5, 4)\nprint(m)\nz.put(\"rm\", m)",
-      "authenticationInfo": {},
       "dateUpdated": "Mar 30, 2016 9:05:25 AM",
       "config": {
         "colWidth": 3.0,
@@ -433,7 +432,6 @@
     {
       "title": "Read from Scala the R Variables",
       "text": "println(\"rs \u003d \"+ z.get(\"rs\"))\nprintln(\"rb \u003d \"+ z.get(\"rb\"))\nprintln(\"rd \u003d \"+ z.get(\"rd\"))\nprintln(\"rm \u003d \"+ z.get(\"rm\"))\n// println(z.get(\"rm\").getClass)\n// println(\"rm \u003d \"+ z.get(\"rm\").asInstanceOf[Array[Double]].toSeq)",
-      "authenticationInfo": {},
       "dateUpdated": "Mar 30, 2016 9:05:27 AM",
       "config": {
         "colWidth": 3.0,
@@ -1009,26 +1007,7 @@
   ],
   "name": "R Tutorial",
   "id": "r",
-  "angularObjects": {
-    "2BGNYGX62": [],
-    "2BH79J543": [],
-    "2BGEQ12SH": [],
-    "2BHEC1U86": [],
-    "2BFC8VSCU": [],
-    "2BEFFGZ94": [],
-    "2BHXPBPPB": [],
-    "2BEUFCFMV": [],
-    "2BEFB8NYY": [],
-    "2BE83RBH6": [],
-    "2BGHNUYS3": [],
-    "2BHWPPHUF": [],
-    "2BHZGMJB4": [],
-    "2BHRGU5SV": [],
-    "2BE19PPM5": [],
-    "2BF3RSAR9": [],
-    "2BFBDB2V5": [],
-    "2BHBNXNS5": []
-  },
+  "angularObjects": {},
   "config": {
     "looknfeel": "default"
   },

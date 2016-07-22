@@ -11,13 +11,30 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
 <div
   id="p{{paragraph.id}}_resize"
   style='padding-bottom: 5px;'
   resize='{"allowresize": "{{!asIframe && !viewOnly}}", "graphType": "{{getResultType()}}"}'
      resizable on-resize="resizeParagraph(width, height);">
   <div ng-include src="'app/notebook/paragraph/paragraph-graph.html'"></div>
+<div> {{paragraph.result}} TESTTT   {{userselected}}</div>     
+ 
+<select name="users" ng-options="user[0] for user in paragraph.result.rows" ng-change="setGraphMode(getGraphMode(), false,false, true, userselected[0])" ng-model="userselected">
+<option value="">--Select User--</option>
+</select><br /><br />
 
+
+<!--  <a ng-click="$event.stopPropagation()" class="dropdown"><span class="fa fa-arrows-h"></span> Width
+          <form style="display:inline; margin-left:5px;">
+            <select ng-model=" col"
+                    class="selectpicker"
+                    ng-change="setNewMode('lineChart')" 
+                    ng-options="col for col in paragraph.result.rows"
+                    ></select>
+          </form>
+        </a> -->
+       
   <div id="{{paragraph.id}}_comment"
        class="text"
        ng-if="getResultType()=='TABLE' && paragraph.result.comment"

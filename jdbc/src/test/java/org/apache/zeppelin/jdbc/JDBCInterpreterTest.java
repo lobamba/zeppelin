@@ -133,23 +133,51 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
   
   @Test
   public void testForMapPrefix() throws SQLException, IOException {
-    Properties properties = new Properties();
-    properties.setProperty("common.max_count", "1000");
-    properties.setProperty("common.max_retry", "3");
-    properties.setProperty("default.driver", "org.h2.Driver");
-    properties.setProperty("default.url", getJdbcConnection());
-    properties.setProperty("default.user", "");
-    properties.setProperty("default.password", "");
-    JDBCInterpreter t = new JDBCInterpreter(properties);
-    t.open();
+  
 
-    String sqlQuery = "(fake) select * from test_table";
+    
+    Thread demon = new Thread(new Runnable() {
+      
+      @Override
+      public void run() {
+        // TODO Auto-generated method stub
+        if(!Thread.currentThread().isDaemon()){
+          String faux= "Demon thread is not executing";
+          System.out.println(faux);
+        }
+        else{
+          String vaie= "Demon thread executing";
+          System.out.println(vaie);
+          
+          Properties properties = new Properties();
+          properties.setProperty("common.max_count", "1000");
+          properties.setProperty("common.max_retry", "3");
+          properties.setProperty("default.driver", "org.h2.Driver");
+          try {
+            properties.setProperty("default.url", getJdbcConnection());
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          properties.setProperty("default.user", "");
+          properties.setProperty("default.password", "");
+        
 
-    InterpreterResult interpreterResult = t.interpret(sqlQuery, new InterpreterContext("", "1", "", "", null, null, null, null, null, null, null));
-
-    // if prefix not found return ERROR and Prefix not found.
-    assertEquals(InterpreterResult.Code.ERROR, interpreterResult.code());
-    assertEquals("Prefix not found.", interpreterResult.message());
+          String sqlQuery = "(fake) select * from test_table";
+          JDBCInterpreter t = new JDBCInterpreter(properties);
+          t.open();
+          InterpreterResult interpreterResult = t.interpret(sqlQuery, new InterpreterContext("", "1", "", "", null, null, null, null, null, null, null));
+          // if prefix not found return ERROR and Prefix not found.
+          assertEquals(InterpreterResult.Code.ERROR, interpreterResult.code());
+          assertEquals("Prefix not found.", interpreterResult.message());
+        }
+        
+      }
+    });
+    demon.setDaemon(true);
+    demon.start();
+    
+  
   }
  /* 
   @Test
@@ -192,7 +220,7 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
   public void testMaci_DB() throws SQLException {
     JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestPropertiesMaci());
     
-    
+  
     String s = jdbcInterpreter.getProperty(DEFAULT_DRIVER) + " et " + jdbcInterpreter.getProperty(DEFAULT_URL);
     assertEquals("oracle.jdbc.driver.OracleDriver", jdbcInterpreter.getProperty(DEFAULT_DRIVER));
     assertEquals("jdbc:oracle:thin:@LHR-LBINTDB101:1521/longa_pdb1", jdbcInterpreter.getProperty(DEFAULT_URL));

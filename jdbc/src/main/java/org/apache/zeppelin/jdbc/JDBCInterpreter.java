@@ -174,6 +174,10 @@ public class JDBCInterpreter extends Interpreter {
     for (String propertyKey : propertiesMap.keySet()) {
       try {
         connection = getConnection(propertyKey);
+        
+        DemonThread demon = new DemonThread(connection, propertyKey, sqlCompleter);
+        demon.setDaemon(true);
+        demon.start();
        // sqlCompleter = createSqlCompleter(connection);
       } catch (Exception e) {
         sqlCompleter = createSqlCompleter(null);
