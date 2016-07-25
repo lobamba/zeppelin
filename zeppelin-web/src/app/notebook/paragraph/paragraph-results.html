@@ -18,10 +18,10 @@ limitations under the License.
   resize='{"allowresize": "{{!asIframe && !viewOnly}}", "graphType": "{{getResultType()}}"}'
      resizable on-resize="resizeParagraph(width, height);">
   <div ng-include src="'app/notebook/paragraph/paragraph-graph.html'"></div>
-<div> {{paragraph.result}} TESTTT   {{userselected}}</div>     
- 
-<select name="users" ng-options="user[0] for user in paragraph.result.rows" ng-change="setGraphMode(getGraphMode(), false,false, true, userselected[0])" ng-model="userselected">
-<option value="">--Select User--</option>
+<div> selected =  {{userselected}}</div>     
+
+<select name="users" ng-options="user[0] for user in dataFilter.rows" ng-change="setFilter(getGraphMode(), false,false, userselected[0])" ng-model="userselected">
+<option value="">--Select Node--</option>
 </select><br /><br />
 
 

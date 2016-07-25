@@ -121,8 +121,13 @@ angular.module('zeppelinWebApp')
 
     if ($scope.getResultType() === 'TABLE') {
       $scope.loadTableData($scope.paragraph.result);
+      $scope.dataFilter = {};
+      $scope.dataFilter.type = newParagraph.result.type;
+      $scope.dataFilter.msg = newParagraph.result.msg;
+      $scope.dataFilter.code = newParagraph.result.code;
+      $scope.loadTableData( $scope.dataFilter);
       $scope.setGraphMode($scope.getGraphMode(), false, false);
-      $scope.dataFilter = $scope.paragraph.result;
+      
     } else if ($scope.getResultType() === 'HTML') {
       $scope.renderHtml();
     } else if ($scope.getResultType() === 'ANGULAR') {
@@ -1213,21 +1218,19 @@ angular.module('zeppelinWebApp')
 	  };
 	
 	  
-	$scope.setResultData = function(param){
-		
-		alert(param);
-		
-		
-		
-		
+	$scope.reloaddata = function(){
+		$scope.loadTableData($scope.paragraph.result); 
+		return $scope.paragraph.result;		
 	  };
-  
   
   $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
 	 
-	 //var test = filter();
+	//$scope.loadTableData( $scope.dataFilter);
+	//$scope.dataFilter.msgTable[0].value = 'TESSST';
 	  
     if (emit) {
+    	 $scope.loadTableData($scope.paragraph.result);
+   
       setNewMode(type);
     } else {
       clearUnknownColsFromGraphOption();
@@ -1235,16 +1238,16 @@ angular.module('zeppelinWebApp')
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_graph').height(height);
       //si fitre=oui, on change la valeur de result
-      var res = paragraphResult(estFiltre, nomFiltre);
+   //   var res = paragraphResult(estFiltre, nomFiltre);
       if (!type || type === 'table') {
-        setTable(res, refresh);
+        setTable($scope.paragraph.result, refresh);
       }
       else {
-        setD3Chart(type, res, refresh);
+        setD3Chart(type, $scope.paragraph.result, refresh);
       }
-      if(estFiltre){
+      /*if(estFiltre){
     	  $scope.loadTableData($scope.dataFilter);
-      }
+      }*/
     }
   };
 
@@ -1344,10 +1347,40 @@ angular.module('zeppelinWebApp')
     return groupedThousandsWith3DigitsFormatter(d);
   };
   
-  var setFilter = function(column, value) {
-	  $scope.filter.column = column;
-	  $scope.filter.value = value;
+  $scope.setFilter = function(type, emit, refresh, nomfiltre) {
+	 $scope.loadTableData($scope.paragraph.result);
+	  var res = $scope.paragraph.result;
+	 // $scope.loadTableData(res);
+	  var key = res.msgTable[0][0].key;
+	  var saveData = [];
+	  var saveRows= [];
+	  for(var i = 0; i < res.msgTable.length; i++){
+		  var list = res.msgTable[i];
+		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
+			 for(var j = 0; j < list.length; j++){
+				 res.msgTable[i][j].key = key; //on garde la cles des tableau
+			 }  
+			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
+			 saveRows[0] = res.rows[i];
+			  //alert(list[0].value);
+		  }/*else{
+			  res.msgTable[i] = null;
+			  res.rows[i] = null;
+		  }*/
+	  }
+	  res.msgTable = saveData;
+	  res.rows = saveRows;
+	  $scope.paragraph.result = res;
+	  
+	  $scope.setGraphMode(type, emit, refresh);
+	 // $scope.loadTableData($scope.paragraph.result);
+	//  $scope.paragraph.result = $scope.dataFilter;
+	  //return res;
+	 // var taille = res.msgTable.length;
+	 // var taille2 = res.rows.length;
   };
+  
+  
   //pour un premier essaie
   var filter = function(nomfiltre) {
 	
