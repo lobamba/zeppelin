@@ -1225,9 +1225,9 @@ angular.module('zeppelinWebApp')
   
   $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
 	 
-	//$scope.loadTableData( $scope.dataFilter);
-	//$scope.dataFilter.msgTable[0].value = 'TESSST';
-	  
+	/* if(!estFiltre){
+		 $scope.userselected = null;
+	 }*/ 
     if (emit) {
     	 $scope.loadTableData($scope.paragraph.result);
    
@@ -1245,9 +1245,6 @@ angular.module('zeppelinWebApp')
       else {
         setD3Chart(type, $scope.paragraph.result, refresh);
       }
-      /*if(estFiltre){
-    	  $scope.loadTableData($scope.dataFilter);
-      }*/
     }
   };
 
@@ -1347,7 +1344,7 @@ angular.module('zeppelinWebApp')
     return groupedThousandsWith3DigitsFormatter(d);
   };
   
-  $scope.setFilter = function(type, emit, refresh, nomfiltre) {
+  $scope.setFilter = function(type, emit, refresh, nomfiltre,d) {
 	 $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
 	 // $scope.loadTableData(res);
@@ -1372,12 +1369,7 @@ angular.module('zeppelinWebApp')
 	  res.rows = saveRows;
 	  $scope.paragraph.result = res;
 	  
-	  $scope.setGraphMode(type, emit, refresh);
-	 // $scope.loadTableData($scope.paragraph.result);
-	//  $scope.paragraph.result = $scope.dataFilter;
-	  //return res;
-	 // var taille = res.msgTable.length;
-	 // var taille2 = res.rows.length;
+	  $scope.setGraphMode(type, emit, refresh,true);
   };
   
   
@@ -1396,17 +1388,12 @@ angular.module('zeppelinWebApp')
 			 }  
 			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
 			 saveRows[0] = res.rows[i];
-			  //alert(list[0].value);
-		  }/*else{
-			  res.msgTable[i] = null;
-			  res.rows[i] = null;
-		  }*/
+			 
+		  }
 	  }
 	  res.msgTable = saveData;
 	  res.rows = saveRows;
 	  return res;
-	 // var taille = res.msgTable.length;
-	 // var taille2 = res.rows.length;
 	  
   };
   
@@ -1465,11 +1452,9 @@ angular.module('zeppelinWebApp')
 
         $scope.chart[type].x(function(d) { return d.label;})
           .y(function(d) { return d.value;});
+        
         $scope.chart[type].pie.dispatch.on('elementClick', function(d){
-          
-            d3.select('#p'+$scope.paragraph.id+'_'+type+' svg').Refresh(); //fais partir le graph
-           // console.dir(d.point);
-           // alert('ok '  + d[0].values.length );
+            $scope.setFilter('pieChart', false,  false, d.label,d);
         });
         var test = d3.select('#p'+$scope.paragraph.id+'_'+type+' svg');
         
@@ -1498,11 +1483,6 @@ angular.module('zeppelinWebApp')
               value : e.y
             });
           }
-         /* d3g.push({
-              label : d[0].values[0].x,
-              value : d[0].values[0]
-            });
-          */
         }
        
         
@@ -1515,10 +1495,9 @@ angular.module('zeppelinWebApp')
         //ICIIIIIIIIIIIIIIIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
         $scope.chart[type].yAxis.axisLabelDistance(50);
         $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
+       //filtre quand on click sur la donnée
         $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
-            
-            console.dir(d.point);
-            alert('ok ');
+            $scope.setFilter('multiBarChart', false,  false, d.point.x);
         });
       } else if (type === 'lineChart' || type === 'stackedAreaChart' || type === 'lineWithFocusChart') {
     	  if($scope.changeDataView){
