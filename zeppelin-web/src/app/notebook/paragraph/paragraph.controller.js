@@ -1344,13 +1344,25 @@ angular.module('zeppelinWebApp')
     return groupedThousandsWith3DigitsFormatter(d);
   };
   
-  $scope.setFilter = function(type, emit, refresh, nomfiltre,d) {
+  /**
+   * Function that allow to filter chart
+   */
+  $scope.setFilter = function(type, emit, refresh, nomfiltre,d, clic) {
 	 $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
 	 // $scope.loadTableData(res);
 	  var key = res.msgTable[0][0].key;
 	  var saveData = [];
 	  var saveRows= [];
+	  var index = 0;
+	  if(type === 'lineChart' && clic){
+		  index = d[0].point.x;
+		  nomfiltre = res.rows[index][0];
+	  }
+	  if(type === 'scatterChart' && clic){
+		  index = d.pointIndex;
+		  nomfiltre = res.rows[index][0];
+	  }
 	  for(var i = 0; i < res.msgTable.length; i++){
 		  var list = res.msgTable[i];
 		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
@@ -1428,6 +1440,9 @@ angular.module('zeppelinWebApp')
 
       $scope.chart[type].xAxis.tickFormat(function(d) {return xAxisTickFormat(d, xLabels);});
       $scope.chart[type].yAxis.tickFormat(function(d) {return xAxisTickFormat(d, yLabels);});
+      $scope.chart[type].scatter.dispatch.on('elementClick', function(d){
+       	$scope.setFilter('scatterChart', false,  false, xLabels[0], d, true);
+       });
       
       // configure how the tooltip looks.
       $scope.chart[type].tooltipContent(function(key, x, y, graph, data) {
@@ -1462,21 +1477,7 @@ angular.module('zeppelinWebApp')
         if ( d.length > 0 ) {
           for ( var i=0; i<d[0].values.length ; i++) {
             var e = d[0].values[i];
-            
-            
-           /* $scope.chart[type].pie.dispatch.on('elementClick', function(d){
-               
-              //  d3.select('#p'+$scope.paragraph.id+'_'+type+' svg').remove(); //fais partir le graph
-               // console.dir(d.point);
-               
-             //   $scope.chart[type].pie.refresh();
-                var e = d[0].values[0];
-                d3g.push({
-                    label : e.x,
-                    value : e.y
-                  });
-                alert(d.length );
-            });*/
+
               
             d3g.push({
               label : e.x,
@@ -1500,9 +1501,7 @@ angular.module('zeppelinWebApp')
             $scope.setFilter('multiBarChart', false,  false, d.point.x);
         });
       } else if (type === 'lineChart' || type === 'stackedAreaChart' || type === 'lineWithFocusChart') {
-    	  if($scope.changeDataView){
-    		  p.rows.kw = null;  
-    	  }
+    	  
         var pivotdata = pivotDataToD3ChartFormat(p, false, true);
         xLabels = pivotdata.xLabels;
         d3g = pivotdata.d3g;
@@ -1512,12 +1511,28 @@ angular.module('zeppelinWebApp')
         if ($scope.chart[type].useInteractiveGuideline) { // lineWithFocusChart hasn't got useInteractiveGuideline
           $scope.chart[type].useInteractiveGuideline(true); // for better UX and performance issue. (https://github.com/novus/nvd3/issues/691)
         }
+   
+        
         if($scope.paragraph.config.graph.forceY) {
           $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
         } else {
           $scope.chart[type].forceY([]);
         }
-      }
+        if(type === 'lineChart'){
+        	$scope.chart[type].lines.dispatch.on('elementClick', function(d){
+                //alert('ok');
+             	$scope.setFilter('lineChart', false,  false, xLabels[0], d, true);
+             });
+
+        }
+        if(type === 'stackedAreaChart'){
+        	$scope.chart[type].stacked.scatter.dispatch.on('elementClick', function(d){
+              //  alert('ok');
+             	$scope.setFilter('stackedAreaChart', false,  false, xLabels[0], d, true);
+             });
+
+        }
+              }
     }
 
     var renderChart = function() {
