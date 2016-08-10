@@ -505,6 +505,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
         + "org.apache.zeppelin.elasticsearch.ElasticsearchInterpreter,"
         + "org.apache.zeppelin.scalding.ScaldingInterpreter,"
         + "org.apache.zeppelin.jdbc.JDBCInterpreter,"
+        + "org.apache.zeppelin.jruby.JrubyInterpreter,"
         + "org.apache.zeppelin.hbase.HbaseInterpreter"),
     ZEPPELIN_INTERPRETER_JSON("zeppelin.interpreter.setting", "interpreter-setting.json"),
     ZEPPELIN_INTERPRETER_DIR("zeppelin.interpreter.dir", "interpreter"),

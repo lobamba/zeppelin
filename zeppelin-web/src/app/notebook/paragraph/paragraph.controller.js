@@ -84,6 +84,7 @@ angular.module('zeppelinWebApp')
     'ace/mode/r': /^%(\w*\.)?(r|sparkr|knitr)\s*$/,
     'ace/mode/sql': /^%(\w*\.)?\wql/,
     'ace/mode/markdown': /^%md/,
+    'ace/mode/ruby': /^%(\w*\.)?ruby\s*$/,
     'ace/mode/sh': /^%sh/
   };
 
@@ -1223,7 +1224,7 @@ angular.module('zeppelinWebApp')
 		return $scope.paragraph.result;		
 	  };
   
-  $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
+  $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre,id) {
 	 
 	/* if(!estFiltre){
 		 $scope.userselected = null;
@@ -1240,10 +1241,11 @@ angular.module('zeppelinWebApp')
       //si fitre=oui, on change la valeur de result
    //   var res = paragraphResult(estFiltre, nomFiltre);
       if (!type || type === 'table') {
-        setTable($scope.paragraph.result, refresh);
+    		  setTable($scope.paragraph.result, refresh); 
       }
       else {
-        setD3Chart(type, $scope.paragraph.result, refresh);
+    		  setD3Chart(type, $scope.paragraph.result, refresh);
+        
       }
     }
   };
@@ -1344,12 +1346,18 @@ angular.module('zeppelinWebApp')
     return groupedThousandsWith3DigitsFormatter(d);
   };
   
+  
+
+  
   /**
    * Function that allow to filter chart
    */
-  $scope.setFilter = function(type, emit, refresh, nomfiltre,d, clic) {
+  $scope.setFilter = function(type, emit, refresh, nomfiltre,d, clic, id) {
+	  
+	 // cette appel est peut etre inutile
 	 $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
+	// var res = $scope.parentNote.paragraphs[id].result;
 	 // $scope.loadTableData(res);
 	  var key = res.msgTable[0][0].key;
 	  var saveData = [];
@@ -1371,6 +1379,7 @@ angular.module('zeppelinWebApp')
 			 }  
 			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
 			 saveRows[0] = res.rows[i];
+			 break;
 			  //alert(list[0].value);
 		  }/*else{
 			  res.msgTable[i] = null;
@@ -1380,8 +1389,38 @@ angular.module('zeppelinWebApp')
 	  res.msgTable = saveData;
 	  res.rows = saveRows;
 	  $scope.paragraph.result = res;
+	  //$scope.parentNote.paragraphs[id].result = res;
+	  //affectation inutile si res et result sont sur le mm pointeur
+	  $scope.setGraphMode(type, emit, refresh,true, nomfiltre, id);
+  };
+  
+  
+
+  $scope.filterToOtherParagraph = function(type, emit, refresh, nomfiltre, d, clic){
 	  
-	  $scope.setGraphMode(type, emit, refresh,true);
+//	  $scope.setFilter(type, emit, refresh, nomfiltre, d, clic);
+	  var saveCurrrentParag = $scope.paragraph.id;
+	  //filtrer sur la premiere requete d'abord ou le laisser dans la boucle!!
+	  //parcour des paragraph 
+	//on verifie si le noeud filtre est dans la liste
+	  for(var i = 0; i < $scope.parentNote.paragraphs.length -1; i++){
+		  $scope.loadTableData($scope.parentNote.paragraphs[i].result);
+		  var res = $scope.parentNote.paragraphs[i].result;
+		   for(var j = 0; j< res.rows.length; j++){
+			   if(nomfiltre === res.rows[j][0]){
+				  $scope.paragraph = $scope.parentNote.paragraphs[i];
+				  //enlever le scope s'il n'est pas appalée dans les html
+				  $scope.setGraphMode(type, emit, refresh,true, nomfiltre, d);
+				//  $scope.setFilter($scope.getGraphMode($scope.parentNote.paragraphs[i]), emit, refresh, nomfiltre, d, clic,i);
+				  break;
+			   }
+		   }
+	  }
+	  for(var k = 0; k < $scope.parentNote.paragraphs.length -1; k++){
+		  if($scope.parentNote.paragraphs[i].id === saveCurrrentParag){
+			  $scope.paragraph = $scope.parentNote.paragraphs[k];
+		  }
+	  }
   };
   
   
@@ -1488,9 +1527,7 @@ angular.module('zeppelinWebApp')
        
         
       } else if (type === 'multiBarChart') {
-    	  if($scope.changeDataView){
-    		  p.rows.kw = null;  
-    	  }
+
         d3g = pivotDataToD3ChartFormat(p, true, false, type).d3g;
        
         //ICIIIIIIIIIIIIIIIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
