@@ -16,12 +16,6 @@ limitations under the License.
      style='margin-bottom: 10px;'>
   <div id="{{paragraph.id}}_switch"
        class="btn-group">
-	<a href="http://www.w3schools.com/">
-	<button type="button" class="btn btn-default btn-sm"
-			ng-class="{'active': isGraphMode('multiBarChart')}"
-			ng-click="setGraphMode('multiBarChart', true)">
-			test
-	</button> </a>
     <button type="button" class="btn btn-default btn-sm"
             ng-class="{'active': isGraphMode('table')}"
             ng-click="setGraphMode('table', true)" ><i class="fa fa-table"></i>
@@ -64,6 +58,12 @@ limitations under the License.
       <li ng-click="exportToDSV('\t')"><a>TSV</a></li>
     </ul>
   </span>
+  <span class="btn-group">
+  <select name="users" ng-options="nom.key as nom.key for nom  in testfilter | unique:'key'" ng-change="testfiltre(getGraphMode(), false,false, userselected)" ng-model="userselected">
+<option value="">Data Filter </option>
+</select>
+  </span>
+  
   <span ng-if="getGraphMode()!='table'"
         style="margin-left:5px; cursor:pointer; display: inline-block; vertical-align:top; position: relative; line-height:30px;">
     <a class="btnText" ng-click="toggleGraphOption()">

@@ -18,23 +18,17 @@ limitations under the License.
   resize='{"allowresize": "{{!asIframe && !viewOnly}}", "graphType": "{{getResultType()}}"}'
      resizable on-resize="resizeParagraph(width, height);">
   <div ng-include src="'app/notebook/paragraph/paragraph-graph.html'"></div>
-<div> selected =  {{userselected}}</div>     
+
+
+<!-- 
+partie filtre  à supprimer
+<div> selected =  {{userselected}}</div>
 
 <select name="users" ng-options="user[0] for user in dataFilter.rows" ng-change="setFilter(getGraphMode(), false,false, userselected[0])" ng-model="userselected">
-<option value="">--Select Node--</option>
+<option value=""></option>
 
 </select><br /><br />
-
-
-<!--  <a ng-click="$event.stopPropagation()" class="dropdown"><span class="fa fa-arrows-h"></span> Width
-          <form style="display:inline; margin-left:5px;">
-            <select ng-model=" col"
-                    class="selectpicker"
-                    ng-change="setNewMode('lineChart')" 
-                    ng-options="col for col in paragraph.result.rows"
-                    ></select>
-          </form>
-        </a> -->
+ -->
        
   <div id="{{paragraph.id}}_comment"
        class="text"

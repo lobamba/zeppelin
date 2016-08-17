@@ -189,11 +189,22 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
       callback: function(result) {
         if (result) {
           _.forEach($scope.note.paragraphs, function (n, key) {
-            angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
+          //  angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
+            angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter('multiBarChart', false, false, 'test');
+            console.log('id: ' + n.id + ' text' + n.text + ' ' + key);
           });
         }
       }
     });
+  };
+  
+  $scope.testfiltre = function(type, emit, refresh, nomfiltre) {
+	  _.forEach($scope.note.paragraphs, function (n, key) {
+          //  angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
+		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
+            angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);
+            console.log('id: ' + typegraph);
+          });
   };
 
   $scope.saveNote = function() {

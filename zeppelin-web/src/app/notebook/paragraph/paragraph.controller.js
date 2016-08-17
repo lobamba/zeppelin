@@ -99,17 +99,8 @@ angular.module('zeppelinWebApp')
     $scope.paragraphFocused = false;
     $scope.booleen = false;
     $scope.userselected = null;
-    $scope.arrlist = [{
-  	  'userid': 1,
-  	  'name': 'Suresh'
-  	  }, {
-  	  'userid': 2,
-  	  'name': 'Rohini'
-  	  }, {
-  	  'userid': 3,
-  	  'name': 'Praveen'
-  	  }];
-    //$scope.userselected = $scope.arrlist;
+   
+    
     if (newParagraph.focus) {
       $scope.paragraphFocused = true;
     }
@@ -127,6 +118,14 @@ angular.module('zeppelinWebApp')
       $scope.dataFilter.msg = newParagraph.result.msg;
       $scope.dataFilter.code = newParagraph.result.code;
       $scope.loadTableData( $scope.dataFilter);
+      $scope.testfilter = [];
+      var k = 0; 
+
+      for (var i=0; i < $scope.dataFilter.rows.length; i++) {
+    	  $scope.testfilter[i] = {
+    			  key : $scope.dataFilter.rows[i][0]
+    	  };
+      }
       $scope.setGraphMode($scope.getGraphMode(), false, false);
       
     } else if ($scope.getResultType() === 'HTML') {
@@ -1355,7 +1354,15 @@ angular.module('zeppelinWebApp')
   $scope.setFilter = function(type, emit, refresh, nomfiltre,d, clic, id) {
 	  
 	 // cette appel est peut etre inutile
-	 $scope.loadTableData($scope.paragraph.result);
+	 
+	 if($scope.paragraph.status === 'ERROR'){
+		 return;
+	 }
+	  if(nomfiltre === undefined || nomfiltre === null){
+		  $scope.setGraphMode(type, emit, refresh);
+		  return;
+	  }
+	  $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
 	// var res = $scope.parentNote.paragraphs[id].result;
 	 // $scope.loadTableData(res);
@@ -1371,20 +1378,25 @@ angular.module('zeppelinWebApp')
 		  index = d.pointIndex;
 		  nomfiltre = res.rows[index][0];
 	  }
+	  var k = 0;
 	  for(var i = 0; i < res.msgTable.length; i++){
 		  var list = res.msgTable[i];
 		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
 			 for(var j = 0; j < list.length; j++){
 				 res.msgTable[i][j].key = key; //on garde la cles des tableau
 			 }  
-			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
-			 saveRows[0] = res.rows[i];
-			 break;
+			 saveData[k] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
+			 saveRows[k] = res.rows[i];
+			 k++;
 			  //alert(list[0].value);
 		  }/*else{
 			  res.msgTable[i] = null;
 			  res.rows[i] = null;
 		  }*/
+	  }
+	  
+	  if(saveData.length === 0 || saveRows.length === 0){
+		  return;
 	  }
 	  res.msgTable = saveData;
 	  res.rows = saveRows;
@@ -1423,7 +1435,27 @@ angular.module('zeppelinWebApp')
 	  }
   };
   
+ var loga =  function(type, element, index) {
+	  alert('a[' + index + '] = ' + element);
+	 // $scope.setFilter(type, emit, refresh, nomfiltre, d, clic)
+  };
   
+  $scope.setAll = function(type, emit, refresh, nomfiltre, d, clic){
+	 /* for(var i = 0; i < $scope.parentNote.paragraphs.length -1; i++) {
+		  $scope.paragraph = $scope.parentNote.paragraphs[i];
+		  $scope.setFilter(type, emit, refresh, nomfiltre, d, clic);
+	  }
+	  angular.forEach($scope.parentNote.paragraphs, function(value, key){
+		  alert( ': ');
+	  });*/
+	  $scope.parentNote.paragraphs.forEach(alert(this));
+	 
+  };
+  
+  $scope.testalert = function() {
+	  alert('ok');
+  };
+
   //pour un premier essaie
   var filter = function(nomfiltre) {
 	
