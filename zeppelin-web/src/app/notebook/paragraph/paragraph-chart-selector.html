@@ -59,7 +59,7 @@ limitations under the License.
     </ul>
   </span>
   <span class="btn-group">
-  <select name="users" ng-options="nom.key as nom.key for nom  in testfilter | unique:'key'" ng-change="testfiltre(getGraphMode(), false,false, userselected)" ng-model="userselected">
+  <select name="users" ng-options="nom.key as nom.key for nom  in testfilter | unique:'key'" ng-change="allParagraphFiltered(getGraphMode(), false,false, userselected)" ng-model="userselected">
 <option value="">Data Filter </option>
 </select>
   </span>
