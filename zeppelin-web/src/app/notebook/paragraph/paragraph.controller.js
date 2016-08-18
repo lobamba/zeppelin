@@ -1225,9 +1225,7 @@ angular.module('zeppelinWebApp')
   
   $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
 	 
-	/* if(!estFiltre){
-		 $scope.userselected = null;
-	 }*/ 
+	
     if (emit) {
     	 $scope.loadTableData($scope.paragraph.result);
    
@@ -1237,8 +1235,6 @@ angular.module('zeppelinWebApp')
       // set graph height
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_graph').height(height);
-      //si fitre=oui, on change la valeur de result
-   //   var res = paragraphResult(estFiltre, nomFiltre);
       if (!type || type === 'table') {
     		  setTable($scope.paragraph.result, refresh); 
       }
@@ -1352,8 +1348,6 @@ angular.module('zeppelinWebApp')
    * Function that allow to filter chart
    */
   $scope.setFilter = function(type, emit, refresh, nomfiltre) {
-	  
-	 // cette appel est peut etre inutile
 	 
 	 if($scope.paragraph.status === 'ERROR'){
 		 return;
@@ -1365,8 +1359,6 @@ angular.module('zeppelinWebApp')
 	  }
 	  
 	  var res = $scope.paragraph.result;
-	// var res = $scope.parentNote.paragraphs[id].result;
-	 // $scope.loadTableData(res);
 	  var key = res.msgTable[0][0].key;
 	  var saveData = [];
 	  var saveRows= [];
@@ -1381,11 +1373,8 @@ angular.module('zeppelinWebApp')
 			 saveData[k] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
 			 saveRows[k] = res.rows[i];
 			 k++;
-			  //alert(list[0].value);
-		  }/*else{
-			  res.msgTable[i] = null;
-			  res.rows[i] = null;
-		  }*/
+			 
+		  }
 	  }
 	  
 	  if(saveData.length === 0 || saveRows.length === 0){
@@ -1397,46 +1386,9 @@ angular.module('zeppelinWebApp')
 	  //affectation inutile si res et result sont sur le mm pointeur
 	  $scope.setGraphMode(type, emit, refresh,true, nomfiltre);
 	  
-	  _.forEach($scope.parentNote.paragraphs, function (n, key) {
-          //  angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
-		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
-           // angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);
-            console.log('mode: ' + typegraph);
-          });
   };
   
   
-
-
-
-  
-  $scope.testalert = function() {
-	  alert('ok');
-  };
-
-  //pour un premier essaie
-  var filter = function(nomfiltre) {
-	
-	  var res = $scope.dataFilter;
-	  var key = res.msgTable[0][0].key;
-	  var saveData = [];
-	  var saveRows= [];
-	  for(var i = 0; i < res.msgTable.length; i++){
-		  var list = res.msgTable[i];
-		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
-			 for(var j = 0; j < list.length; j++){
-				 res.msgTable[i][j].key = key; //on garde la cles des tableau
-			 }  
-			 saveData[0] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
-			 saveRows[0] = res.rows[i];
-			 
-		  }
-	  }
-	  res.msgTable = saveData;
-	  res.rows = saveRows;
-	  return res;
-	  
-  };
   
    $scope.allParagraphFiltered = function(type, emit, refresh, nomfiltre) {
 	  _.forEach($scope.parentNote.paragraphs, function (n, key) {
@@ -1520,10 +1472,10 @@ angular.module('zeppelinWebApp')
 
         d3g = pivotDataToD3ChartFormat(p, true, false, type).d3g;
        
-        //ICIIIIIIIIIIIIIIIIIIIIIIIIIIIiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+       
         $scope.chart[type].yAxis.axisLabelDistance(50);
         $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
-       //filtre quand on click sur la donnée
+       //filter when clicked on graph
         $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
         	$scope.allParagraphFiltered('multiBarChart', false,  false, d.point.x);
         });
