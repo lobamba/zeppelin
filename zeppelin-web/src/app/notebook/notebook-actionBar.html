@@ -87,6 +87,8 @@ limitations under the License.
                 tooltip-placement="bottom" tooltip="Version control">
           <i class="fa fa-file-code-o"></i>
         </button>
+
+                 
     </span>
 
 <!-- put the delete action by itself for your protection -->
@@ -99,7 +101,6 @@ limitations under the License.
         <i class="icon-trash"></i>
       </button>
     </span>
-
     <span ng-hide="viewOnly">
       <div class="labelBtn btn-group">
         <div class="btn btn-default btn-xs dropdown-toggle"
@@ -148,6 +149,16 @@ limitations under the License.
           </li>
         </ul>
       </div>
+    </span>
+    <span>
+            <button type="button"
+                  class="btn btn-default btn-xs"
+                  ng-hide="viewOnly"
+                  ng-class="{'active' : noFilter()}"
+                  ng-click="allParagraphFiltered(getGraphMode(), true)"
+                  tooltip-placement="bottom" tooltip="click on graph to filter"><i class="fa fa-filter"></i>
+                  {{initValue}}
+                </button>
     </span>
 
     <div class="pull-right" style="margin-top:15px; margin-right:15px; font-size:15px;">

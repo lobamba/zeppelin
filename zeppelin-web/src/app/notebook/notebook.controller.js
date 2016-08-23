@@ -196,7 +196,77 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
     });
   };
   
-
+  $scope.allParagraph = function(type, emit, refresh, nomfiltre) {
+	  _.forEach($scope.note.paragraphs, function (n, key) {
+  		 // var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
+              angular.element('#' + n.id + '_paragraphColumn_main').scope().items = [{
+            	  id: n.id,
+            	  label: 'aLabel',
+            	  subItem: { name: 'aSubItem' }
+            	}, {
+            	  id: 2,
+            	  label: 'bLabel',
+            	  subItem: { name: 'bSubItem' }
+            	}];
+              
+              
+            });
+	  
+  };
+  
+$scope.compteur =[];
+  $scope.testok = function(){
+	  $scope.compteur.push(10);
+	  console.log('compteur: ' + $scope.compteur[0]);
+  };
+  $scope.initValue = '';
+  //$scope.setValueFiltered = 0;
+  $scope.listDataFilter = [];
+ $scope.saveAllData = function(){
+	 _.forEach($scope.note.paragraphs, function(n, key) {
+		 var tmp = [];
+		 
+		 for (var i=0; i< n.result.rows.length; i++) {
+			 tmp[i] = {
+					 key : n.result.rows[i][0]
+			 };
+		 }
+		 $scope.listDataFilter.push(tmp);
+	        //angular.element('#' + n.id + '_paragraphColumn_main').scope().saveParagraph();
+	      });
+  };
+  
+  $scope.allParagraphFiltered = function(type, emit, refresh, nomfiltre, valueFiltered) {
+	  _.forEach($scope.note.paragraphs, function (n, key) {
+		  //default: the last paragraph have no data
+		  if(n.result === undefined || n.result.type === 'TEXT'){
+			  return;
+		  }
+  		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
+		  if(nomfiltre === undefined){
+			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setGraphMode(typegraph, true);
+		  }else{
+			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);
+	            
+		  }
+             
+            });
+	  if(nomfiltre !== undefined ){
+		  $scope.initValue = nomfiltre+': ' + valueFiltered ;
+	  }else{
+		  $scope.initValue = '';
+	  }
+	 
+  };
+  
+  $scope.noFilter = function() {
+	if ($scope.initValue === '' || $scope.initValue === undefined){
+		return false;
+	}
+	return true;
+	
+};
+  
   $scope.saveNote = function() {
     if ($scope.note && $scope.note.paragraphs) {
       _.forEach($scope.note.paragraphs, function(n, key) {

@@ -12,7 +12,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <!-- Here the controller <NotebookCtrl> is not needed because explicitly set in the app.js (route) -->
+
 <div ng-include src="'app/notebook/notebook-actionBar.html'"></div>
+
 <div style="padding-top: 36px;">
   <!-- settings -->
   <div ng-if="showSetting" class="setting">
@@ -143,7 +145,8 @@ limitations under the License.
     <div class="new-paragraph" ng-click="insertNew('below');" ng-hide="!$last || viewOnly || asIframe ">
       <h4 class="plus-sign">&#43;</h4>
     </div>
-
+	
   </div>
+   
   <div style="clear:both;height:10px"></div>
 </div>
