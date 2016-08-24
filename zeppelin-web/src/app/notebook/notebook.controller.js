@@ -180,7 +180,8 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
     });
     document.getElementById('note.checkpoint.message').value='';
   };
-
+  $scope.initValue = ''; 
+ 
   $scope.runNote = function() {
     BootstrapDialog.confirm({
       closable: true,
@@ -191,59 +192,23 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
           _.forEach($scope.note.paragraphs, function (n, key) {
         	  angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
           });
+        $scope.initValue = ''; 
         }
       }
     });
+    
   };
   
-  $scope.allParagraph = function(type, emit, refresh, nomfiltre) {
-	  _.forEach($scope.note.paragraphs, function (n, key) {
-  		 // var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
-              angular.element('#' + n.id + '_paragraphColumn_main').scope().items = [{
-            	  id: n.id,
-            	  label: 'aLabel',
-            	  subItem: { name: 'aSubItem' }
-            	}, {
-            	  id: 2,
-            	  label: 'bLabel',
-            	  subItem: { name: 'bSubItem' }
-            	}];
-              
-              
-            });
-	  
-  };
-  
-$scope.compteur =[];
-  $scope.testok = function(){
-	  $scope.compteur.push(10);
-	  console.log('compteur: ' + $scope.compteur[0]);
-  };
-  $scope.initValue = '';
-  //$scope.setValueFiltered = 0;
-  $scope.listDataFilter = [];
- $scope.saveAllData = function(){
-	 _.forEach($scope.note.paragraphs, function(n, key) {
-		 var tmp = [];
-		 
-		 for (var i=0; i< n.result.rows.length; i++) {
-			 tmp[i] = {
-					 key : n.result.rows[i][0]
-			 };
-		 }
-		 $scope.listDataFilter.push(tmp);
-	        //angular.element('#' + n.id + '_paragraphColumn_main').scope().saveParagraph();
-	      });
-  };
-  
-  $scope.allParagraphFiltered = function(type, emit, refresh, nomfiltre, valueFiltered) {
+ 
+  $scope.allParagraphFiltered = function(emit, refresh, nomfiltre, valueFiltered) {
 	  _.forEach($scope.note.paragraphs, function (n, key) {
 		  //default: the last paragraph have no data
 		  if(n.result === undefined || n.result.type === 'TEXT'){
 			  return;
 		  }
   		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
-		  if(nomfiltre === undefined){
+		 //remove filter by clicking the button filter
+  		  if(nomfiltre === undefined){
 			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setGraphMode(typegraph, true);
 		  }else{
 			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);

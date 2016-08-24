@@ -22,9 +22,6 @@ angular.module('zeppelinWebApp')
   $scope.paragraph = null;
   $scope.originalText = '';
   $scope.editor = null;
-  //$scope.listOfData = [];
- // $scope.indexListData = 0;
-  $scope.saveId = '';
   
 
   var paragraphScope = $rootScope.$new(true, $rootScope);
@@ -101,7 +98,7 @@ angular.module('zeppelinWebApp')
     $scope.colWidthOption = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
     $scope.showTitleEditor = false;
     $scope.paragraphFocused = false;
-    $scope.booleen = false;
+    //userselected allow to save the filtered value
     $scope.userselected = null;
    
     
@@ -117,21 +114,6 @@ angular.module('zeppelinWebApp')
 
     if ($scope.getResultType() === 'TABLE') {
       $scope.loadTableData($scope.paragraph.result);
-      $scope.dataFilter = {};
-      $scope.dataFilter.type = newParagraph.result.type;
-      $scope.dataFilter.msg = newParagraph.result.msg;
-      $scope.dataFilter.code = newParagraph.result.code;
-      $scope.loadTableData( $scope.dataFilter);
-      $scope.testfilter = [];
-      //var k = 0; 
-
-      for (var i=0; i < $scope.dataFilter.rows.length; i++) {
-    	  $scope.testfilter[i] = {
-    			  key : $scope.dataFilter.rows[i][0]
-    	  };
-      }
-      //$scope.listOfData[$scope.indexListData] = $scope.testfilter;
-    //  $scope.indexListData++;
       $scope.setGraphMode($scope.getGraphMode(), false, false);
       
     } else if ($scope.getResultType() === 'HTML') {
@@ -1211,37 +1193,13 @@ angular.module('zeppelinWebApp')
     }
   };
 
-
-	   
-	  $scope.getdetails = function () {
-	  if($scope.userselected.userid === '2'){
-		  $scope.result = true;  
-	  }
-	  else{
-		  $scope.result = false;  
-	  }
-	  
-	  };
-	
-	  
-	$scope.reloaddata = function(){
-		$scope.loadTableData($scope.paragraph.result); 
-		return $scope.paragraph.result;		
-	  };
-  $scope.testGetId = function(){
-	  $scope.saveId = $scope.paragraph.id;
-	  console.log('test id ' + $scope.saveId);
-	  
-  };
 	  
 	  
-  $scope.setGraphMode = function(type, emit, refresh, estFiltre, nomFiltre) {
-	 
-	
+  $scope.setGraphMode = function(type, emit, refresh, estFiltre) {
+	 	
     if (emit) {
-    	 $scope.loadTableData($scope.paragraph.result);
-   
-      setNewMode(type);
+    	$scope.loadTableData($scope.paragraph.result);
+    	setNewMode(type);
     } else {
       clearUnknownColsFromGraphOption();
       // set graph height
@@ -1360,13 +1318,8 @@ angular.module('zeppelinWebApp')
    * Function that allow to filter chart
    */
   $scope.setFilter = function(type, emit, refresh, nomfiltre) {
-	 
-	 $scope.loadTableData($scope.paragraph.result);
-	 /* if(nomfiltre === undefined || nomfiltre === null){
-		  $scope.setGraphMode(type, emit, refresh);
-		  return;
-	  }*/
-	  
+	 //reload is necessary the second time the user applies a filter
+	  $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
 	  var key = res.msgTable[0][0].key;
 	  var saveData = [];
@@ -1377,61 +1330,26 @@ angular.module('zeppelinWebApp')
 			 for(var j = 0; j < res.msgTable[i].length; j++){
 				 if(res.msgTable[i][j].value === nomfiltre){
 					if( res.msgTable[i][j].key === undefined){
-						res.msgTable[i][j].key = key; //on garde la cles des tableau
+						res.msgTable[i][j].key = key; //Save the line key (array)
 					}
-					 saveData[k] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
+					 saveData[k] = res.msgTable[i]; 
 					 saveRows[k] = res.rows[i];
 					 k++;
-					 break;
+					 break; //for the first time we filter one value
 				 }
-				 
 			 }  
-			
-			 
-		  
 	  }
-	  
-	  /*
-	   * 	  for(var i = 0; i < res.msgTable.length; i++){
-		  var list = res.msgTable[i];
-		  if(list[0].value === nomfiltre){ //est egale a la valeur selectionne, recuperer la valeur de la mesure correspondant
-			 for(var j = 0; j < list.length; j++){
-				 res.msgTable[i][j].key = key; //on garde la cles des tableau
-			 }  
-			 saveData[k] = res.msgTable[i]; //voir apres si c'est necessaire de sauvegarder ou de laisser les null
-			 saveRows[k] = res.rows[i];
-			 k++;
-			 
-		  }
-	  }
-	   * 
-	   */
-	  
+	  //the paragraph doesn't contain  the filter value
 	  if(saveData.length === 0 || saveRows.length === 0){
 		  return;
 	  }
 	  res.msgTable = saveData;
 	  res.rows = saveRows;
-	  $scope.paragraph.result = res;
-	  //affectation inutile si res et result sont sur le mm pointeur
-	  $scope.setGraphMode(type, emit, refresh,true, nomfiltre);
+	 // $scope.paragraph.result = res;
+	  $scope.setGraphMode(type, emit, refresh);
 	  
   };
   
-  
-
-  
-   /*$scope.allParagraphFiltered = function(type, emit, refresh, nomfiltre) {
-	  _.forEach($scope.parentNote.paragraphs, function (n, key) {
-  		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
-              angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);
-              
-            });
-	  
-  };*/
-
-  
- 
 
   var setD3Chart = function(type, data, refresh) {
 	
@@ -1455,7 +1373,7 @@ angular.module('zeppelinWebApp')
       $scope.chart[type].yAxis.tickFormat(function(d) {return xAxisTickFormat(d, yLabels);});
       $scope.chart[type].scatter.dispatch.on('elementClick', function(d){
     	  index = d.pointIndex;
-       	$scope.allParagraphFiltered('scatterChart', false,  false, xLabels[index], d.point.y);
+    	  $scope.allParagraphFiltered(false,  false, xLabels[index], d.point.y);
        });
       
       // configure how the tooltip looks.
@@ -1483,7 +1401,7 @@ angular.module('zeppelinWebApp')
           .y(function(d) { return d.value;});
         
         $scope.chart[type].pie.dispatch.on('elementClick', function(d){
-            $scope.allParagraphFiltered('pieChart', false,  false, d.label, d.value);
+            $scope.allParagraphFiltered(false,  false, d.label, d.value);
         });
         var test = d3.select('#p'+$scope.paragraph.id+'_'+type+' svg');
         
@@ -1510,7 +1428,7 @@ angular.module('zeppelinWebApp')
         $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
        //filter when clicked on graph
         $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
-        	$scope.allParagraphFiltered('multiBarChart', false,  false, d.point.x, d.value);
+        	$scope.allParagraphFiltered(false,  false, d.point.x, d.value);
         });
       } else if (type === 'lineChart' || type === 'stackedAreaChart' || type === 'lineWithFocusChart') {
     	  
@@ -1533,13 +1451,13 @@ angular.module('zeppelinWebApp')
         if(type === 'lineChart'){
         	$scope.chart[type].lines.dispatch.on('elementClick', function(d){
         		index = d[0].pointIndex;
-             	$scope.allParagraphFiltered('lineChart', false,  false, xLabels[index], d[0].point.y);
+             	$scope.allParagraphFiltered(false,  false, xLabels[index], d[0].point.y);
              });
 
         }
         if(type === 'stackedAreaChart'){
         	$scope.chart[type].stacked.scatter.dispatch.on('elementClick', function(d){
-             	$scope.allParagraphFiltered('stackedAreaChart', false,  false, xLabels[0]);
+             	$scope.allParagraphFiltered(false,  false, xLabels[0]);
              });
 
         }
