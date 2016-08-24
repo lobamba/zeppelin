@@ -49,15 +49,7 @@ public class JrubyInterpreter extends Interpreter {
   Logger logger = LoggerFactory.getLogger(JrubyInterpreter.class);
   private ScriptingContainer scriptingContainer;
   private StringWriter writer;
-  
- /* private static final String EXECUTOR_KEY = "executor";
-  public static final String SHELL_COMMAND_TIMEOUT = "shell.command.timeout.millisecs";
-  int commandTimeOut;
-  private static final boolean isWindows = System
-          .getProperty("os.name")
-          .startsWith("Windows");
-  final String shell = isWindows ? "cmd /c" : "bash -c";*/
-
+ 
   public JrubyInterpreter(Properties property) {
     super(property);
   }
@@ -67,9 +59,7 @@ public class JrubyInterpreter extends Interpreter {
     this.scriptingContainer  = new ScriptingContainer(LocalContextScope.SINGLETON);
     this.writer = new StringWriter();
     scriptingContainer.setOutput(this.writer);
-   // logger.info("Command timeout is set as:", SHELL_COMMAND_TIMEOUT);
-
-   // commandTimeOut = Integer.valueOf(getProperty(SHELL_COMMAND_TIMEOUT));
+  
   }
 
   @Override

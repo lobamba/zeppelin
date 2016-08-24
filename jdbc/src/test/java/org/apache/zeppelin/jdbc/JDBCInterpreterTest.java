@@ -54,7 +54,7 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     }
     return jdbcConnection;
   }
-/*
+
   public static Properties getJDBCTestProperties() {
     Properties p = new Properties();
     p.setProperty("default.driver", "org.postgresql.Driver");
@@ -64,31 +64,9 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     p.setProperty("common.max_count", "1000");
 
     return p;
-  }*/
-  
-  public static Properties getJDBCTestProperties() {
-    Properties p = new Properties();
-    p.setProperty("bubbleci.driver", "oracle.jdbc.driver.OracleDriver");
-    p.setProperty("bubbleci.url", "jdbc:oracle:thin:@fgr-lgcibdb201:1521/shortd");
-    p.setProperty("bubbleci.user", "bubbleci");
-    p.setProperty("bubbleci.password", "a");
-    p.setProperty("common.max_count", "1000");
-    p.setProperty("bubbleci.context", "1528");
-
-
-    return p;
   }
   
-  public static Properties getJDBCTestPropertiesMaci() {
-    Properties p = new Properties();
-    p.setProperty("default.driver", "oracle.jdbc.driver.OracleDriver");
-    p.setProperty("default.url", "jdbc:oracle:thin:@LHR-LBINTDB101:1521/longa_pdb1");
-    p.setProperty("default.user", "maci");
-    p.setProperty("default.password", "a");
-    p.setProperty("common.max_count", "1000");
-
-    return p;
-  }
+  
   
   @Before
   public void setUp() throws Exception {
@@ -179,62 +157,9 @@ public class JDBCInterpreterTest extends BasicJDBCTestCaseAdapter {
     
   
   }
- /* 
-  @Test
-  public void testDefaultProperties() throws SQLException {
-    JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestProperties());
-    
-    assertEquals("org.postgresql.Driver", jdbcInterpreter.getProperty(DEFAULT_DRIVER));
-    assertEquals("jdbc:postgresql://localhost:5432/", jdbcInterpreter.getProperty(DEFAULT_URL));
-    assertEquals("gpadmin", jdbcInterpreter.getProperty(DEFAULT_USER));
-    assertEquals("", jdbcInterpreter.getProperty(DEFAULT_PASSWORD));
-    assertEquals("1000", jdbcInterpreter.getProperty(COMMON_MAX_LINE));
-  }*/
-  
-  
-  
-/*  @Test
-  public void testjdbc() throws SQLException {
-    
-    JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestProperties());
-    
-    
-    String s = jdbcInterpreter.getProperty(DEFAULT_DRIVER) + " et " + jdbcInterpreter.getProperty(URL_KEY);
-  //  assertEquals("oracle.jdbc.driver.OracleDriver", jdbcInterpreter.getProperty(DRIVER_KEY));
-  //  assertEquals("jdbc:oracle:thin:@fgr-lgcibdb201:1521/shortd", jdbcInterpreter.getProperty(URL_KEY));
-    //assertEquals("bubbleci", jdbcInterpreter.getProperty(DEFAULT_USER));
-    //assertEquals("a", jdbcInterpreter.getProperty(DEFAULT_PASSWORD));
-    //assertEquals("1000", jdbcInterpreter.getProperty(COMMON_MAX_LINE));
-    jdbcInterpreter.open();
-    String sqlQuery = "(bubbleci) select * from sii_cfl where rownum < 10";
 
-    InterpreterResult interpreterResult = jdbcInterpreter.interpret(sqlQuery, new InterpreterContext("", "1", "", "", null, null, null, null, null, null, null));
-
-    assertEquals(InterpreterResult.Code.SUCCESS, interpreterResult.code());
-    assertEquals(InterpreterResult.Type.TABLE, interpreterResult.type());
-  }*/
   
-  
-  //test maci, avec  les appels de fonctions
-  @Test
-  public void testMaci_DB() throws SQLException {
-    JDBCInterpreter jdbcInterpreter = new JDBCInterpreter(getJDBCTestPropertiesMaci());
-    
-  
-    String s = jdbcInterpreter.getProperty(DEFAULT_DRIVER) + " et " + jdbcInterpreter.getProperty(DEFAULT_URL);
-    assertEquals("oracle.jdbc.driver.OracleDriver", jdbcInterpreter.getProperty(DEFAULT_DRIVER));
-    assertEquals("jdbc:oracle:thin:@LHR-LBINTDB101:1521/longa_pdb1", jdbcInterpreter.getProperty(DEFAULT_URL));
-    assertEquals("maci", jdbcInterpreter.getProperty(DEFAULT_USER));
-    assertEquals("a", jdbcInterpreter.getProperty(DEFAULT_PASSWORD));
-    assertEquals("1000", jdbcInterpreter.getProperty(COMMON_MAX_LINE));
-    jdbcInterpreter.open();
-    String sqlQuery = "select * from maci_robot_stat where rownum < 10";
 
-    InterpreterResult interpreterResult = jdbcInterpreter.interpret(sqlQuery, new InterpreterContext("", "1", "", "", null, null, null, null, null, null, null));
-
-    assertEquals(InterpreterResult.Code.SUCCESS, interpreterResult.code());
-    assertEquals(InterpreterResult.Type.TABLE, interpreterResult.type());
-  }
   
   @Test
   public void testSelectQuery() throws SQLException, IOException {

@@ -46,15 +46,12 @@ public class DemonThread extends Thread {
   
   public void run(){
     if (Thread.currentThread().isDaemon()){
-      System.out.println("DemonThread.run() " + "demon existing");
+      //System.out.println("DemonThread.run() " + "demon existing");
       try {
         sqlCompleter = createSqlCompleter(connection);
       } catch (Exception e){
         sqlCompleter = createSqlCompleter(null);
       }
-      
-    } else {
-      System.out.println("DemonThread.run() "  + "demon is not exixting");
     }
   }
   
