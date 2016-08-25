@@ -180,6 +180,7 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
     });
     document.getElementById('note.checkpoint.message').value='';
   };
+  //contains the data filtered with value
   $scope.initValue = ''; 
  
   $scope.runNote = function() {
@@ -200,7 +201,7 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
   };
   
  
-  $scope.allParagraphFiltered = function(emit, refresh, nomfiltre, valueFiltered) {
+  $scope.allParagraphFiltered = function(emit, refresh, nameFiltered, valueFiltered) {
 	  _.forEach($scope.note.paragraphs, function (n, key) {
 		  //default: the last paragraph have no data
 		  if(n.result === undefined || n.result.type === 'TEXT'){
@@ -208,16 +209,16 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
 		  }
   		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
 		 //remove filter by clicking the button filter
-  		  if(nomfiltre === undefined){
+  		  if(nameFiltered === undefined){
 			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setGraphMode(typegraph, true);
 		  }else{
-			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nomfiltre);
+			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nameFiltered);
 	            
 		  }
              
             });
-	  if(nomfiltre !== undefined ){
-		  $scope.initValue = nomfiltre+': ' + valueFiltered ;
+	  if(nameFiltered !== undefined ){
+		  $scope.initValue = nameFiltered+': ' + valueFiltered ;
 	  }else{
 		  $scope.initValue = '';
 	  }

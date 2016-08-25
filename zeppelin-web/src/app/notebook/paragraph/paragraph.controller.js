@@ -1317,7 +1317,7 @@ angular.module('zeppelinWebApp')
   /**
    * Function that allow to filter chart
    */
-  $scope.setFilter = function(type, emit, refresh, nomfiltre) {
+  $scope.setFilter = function(type, emit, refresh, nameFiltered) {
 	 //reload is necessary the second time the user applies a filter
 	  $scope.loadTableData($scope.paragraph.result);
 	  var res = $scope.paragraph.result;
@@ -1328,7 +1328,7 @@ angular.module('zeppelinWebApp')
 	  var k = 0;
 	  for(var i = 0; i < res.msgTable.length; i++){
 			 for(var j = 0; j < res.msgTable[i].length; j++){
-				 if(res.msgTable[i][j].value === nomfiltre){
+				 if(res.msgTable[i][j].value === nameFiltered){
 					if( res.msgTable[i][j].key === undefined){
 						res.msgTable[i][j].key = key; //Save the line key (array)
 					}
