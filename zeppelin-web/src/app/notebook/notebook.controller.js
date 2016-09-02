@@ -181,7 +181,7 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
     document.getElementById('note.checkpoint.message').value='';
   };
   //contains the data filtered with value
-  $scope.initValue = ''; 
+  $scope.filteredData = ''; 
  
   $scope.runNote = function() {
     BootstrapDialog.confirm({
@@ -193,7 +193,7 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
           _.forEach($scope.note.paragraphs, function (n, key) {
         	  angular.element('#' + n.id + '_paragraphColumn_main').scope().runParagraph(n.text);
           });
-        $scope.initValue = ''; 
+        $scope.filteredData = ''; 
         }
       }
     });
@@ -201,32 +201,33 @@ angular.module('zeppelinWebApp').controller('NotebookCtrl',
   };
   
  
-  $scope.allParagraphFiltered = function(emit, refresh, nameFiltered, valueFiltered) {
+  $scope.allParagraphFiltered = function(emit, refresh, columnName, nameOfFilteredData) {
 	  _.forEach($scope.note.paragraphs, function (n, key) {
 		  //default: the last paragraph have no data
 		  if(n.result === undefined || n.result.type === 'TEXT'){
 			  return;
 		  }
-  		  var typegraph = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
+  		  var graphMode = angular.element('#' + n.id + '_paragraphColumn_main').scope().getGraphMode();
 		 //remove filter by clicking the button filter
-  		  if(nameFiltered === undefined){
-			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setGraphMode(typegraph, true);
+  		  if(nameOfFilteredData === undefined){
+			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setGraphMode(graphMode, true);
 		  }else{
-			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(typegraph, emit, refresh, nameFiltered);
+			 // console.log(n.config.graph.keys[0].name);
+			  angular.element('#' + n.id + '_paragraphColumn_main').scope().setFilter(graphMode, emit, refresh, columnName, nameOfFilteredData);
 	            
 		  }
              
             });
-	  if(nameFiltered !== undefined ){
-		  $scope.initValue = nameFiltered+': ' + valueFiltered ;
+	  if(nameOfFilteredData !== undefined ){
+		  $scope.filteredData = columnName + ': ' +  nameOfFilteredData  ;
 	  }else{
-		  $scope.initValue = '';
+		  $scope.filteredData = '';
 	  }
 	 
   };
   
   $scope.noFilter = function() {
-	if ($scope.initValue === '' || $scope.initValue === undefined){
+	if ($scope.filteredData === '' || $scope.filteredData === undefined){
 		return false;
 	}
 	return true;

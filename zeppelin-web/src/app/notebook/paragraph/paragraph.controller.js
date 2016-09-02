@@ -22,10 +22,7 @@ angular.module('zeppelinWebApp')
   $scope.paragraph = null;
   $scope.originalText = '';
   $scope.editor = null;
-  
-
   var paragraphScope = $rootScope.$new(true, $rootScope);
-
   // to keep backward compatibility
   $scope.compiledScope = paragraphScope;
 
@@ -85,7 +82,6 @@ angular.module('zeppelinWebApp')
     'ace/mode/r': /^%(\w*\.)?(r|sparkr|knitr)\s*$/,
     'ace/mode/sql': /^%(\w*\.)?\wql/,
     'ace/mode/markdown': /^%md/,
-    'ace/mode/ruby': /^%(\w*\.)?ruby\s*$/,
     'ace/mode/sh': /^%sh/
   };
 
@@ -98,14 +94,9 @@ angular.module('zeppelinWebApp')
     $scope.colWidthOption = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ];
     $scope.showTitleEditor = false;
     $scope.paragraphFocused = false;
-    //userselected allow to save the filtered value
-    $scope.userselected = null;
-   
-    
     if (newParagraph.focus) {
       $scope.paragraphFocused = true;
     }
-
     if (!$scope.paragraph.config) {
       $scope.paragraph.config = {};
     }
@@ -115,7 +106,6 @@ angular.module('zeppelinWebApp')
     if ($scope.getResultType() === 'TABLE') {
       $scope.loadTableData($scope.paragraph.result);
       $scope.setGraphMode($scope.getGraphMode(), false, false);
-      
     } else if ($scope.getResultType() === 'HTML') {
       $scope.renderHtml();
     } else if ($scope.getResultType() === 'ANGULAR') {
@@ -163,7 +153,6 @@ angular.module('zeppelinWebApp')
 
   $scope.renderText = function() {
     var retryRenderer = function() {
-
       var textEl = angular.element('#p' + $scope.paragraph.id + '_text');
       if (textEl.length) {
         // clear all lines before render
@@ -204,7 +193,6 @@ angular.module('zeppelinWebApp')
       doc[0].scrollTop = doc[0].scrollHeight;
     }
   };
-
 
 
   $scope.$on('angularObjectUpdate', function(event, data) {
@@ -1192,10 +1180,9 @@ angular.module('zeppelinWebApp')
       result.rows = rows;
     }
   };
-
+  
 	  
-	  
-  $scope.setGraphMode = function(type, emit, refresh, estFiltre) {
+  $scope.setGraphMode = function(type, emit, refresh) {
 	 	
     if (emit) {
     	$scope.loadTableData($scope.paragraph.result);
@@ -1206,11 +1193,12 @@ angular.module('zeppelinWebApp')
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_graph').height(height);
       if (!type || type === 'table') {
-    		  setTable($scope.paragraph.result, refresh); 
+    	  setTable($scope.paragraph.result, refresh); 
+      } else if (type === 'pivot') {
+    	  setTablePivot($scope.paragraph.result, refresh);
       }
       else {
-    		  setD3Chart(type, $scope.paragraph.result, refresh);
-        
+    	  setD3Chart(type, $scope.paragraph.result, refresh);
       }
     }
   };
@@ -1229,11 +1217,43 @@ angular.module('zeppelinWebApp')
     websocketMsgSrv.commitParagraph($scope.paragraph.id, title, text, config, params);
   };
 
+  var setTablePivot = function(data, refresh) {
+	  var renderTablePivot = function() {
+		  var height = $scope.paragraph.config.graph.height;
+	      var resultRows = $scope.paragraph.result.rows;
+	      var columnNames = _.pluck($scope.paragraph.result.columnNames, 'name');
+	      var container = angular.element('#p' + $scope.paragraph.id + '_pivot');
+	      var tmp = $scope.paragraph.config.graph.keys[0].name;
+	      var val =  $scope.paragraph.config.graph.values[0].name;
+	      container.css('height', height);
+	      container.pivotUI([columnNames].concat(resultRows), {
+	      	cols: [tmp],
+	       	rows: ['TYPE'],
+	       	vals:['Duration'],
+	        aggregatorName: 'Sum',	
+	        });
+	      };
+	  
+	      var retryRenderer = function() {
+	        if (angular.element('#p' + $scope.paragraph.id + '_pivot').length) {
+	          try {
+	            renderTablePivot();
+	          } catch(err) {
+	            console.log('Chart drawing error %o', err);
+	          }
+	        } else {
+	          $timeout(retryRenderer,10);
+	        }
+	      };
+	      $timeout(retryRenderer);
+	    };
+  
+  
   var setTable = function(data, refresh) {
     var renderTable = function() {
       var height = $scope.paragraph.config.graph.height;
       angular.element('#p' + $scope.paragraph.id + '_table').css('height', height);
-      var resultRows = data.rows;//$scope.paragraph.result.rows;
+      var resultRows = data.rows;
       var columnNames = _.pluck(data.columnNames, 'name');
       var container = document.getElementById('p' + $scope.paragraph.id + '_table');
 
@@ -1311,52 +1331,45 @@ angular.module('zeppelinWebApp')
     return groupedThousandsWith3DigitsFormatter(d);
   };
   
-  
-
-  
   /**
    * Function that allow to filter chart
    */
-  $scope.setFilter = function(type, emit, refresh, nameFiltered) {
+  $scope.setFilter = function(type, emit, refresh, columnName, filteredValue) {
 	 //reload is necessary the second time the user applies a filter
 	  $scope.loadTableData($scope.paragraph.result);
-	  var res = $scope.paragraph.result;
-	  var key = res.msgTable[0][0].key;
-	  var saveData = [];
-	  var saveRows= [];
-
-	  var k = 0;
-	  for(var i = 0; i < res.msgTable.length; i++){
-			 for(var j = 0; j < res.msgTable[i].length; j++){
-				 if(res.msgTable[i][j].value === nameFiltered){
-					if( res.msgTable[i][j].key === undefined){
-						res.msgTable[i][j].key = key; //Save the line key (array)
-					}
-					 saveData[k] = res.msgTable[i]; 
-					 saveRows[k] = res.rows[i];
-					 k++;
-					 break; //for the first time we filter one value
-				 }
-			 }  
-	  }
-	  //the paragraph doesn't contain  the filter value
-	  if(saveData.length === 0 || saveRows.length === 0){
+	  var columnNameFinded = _.find($scope.paragraph.result.columnNames, function(o){return o.name=== columnName;});
+	  //if the column name doesn't exist on the paragraph then return
+	  if(columnNameFinded === undefined){
 		  return;
 	  }
-	  res.msgTable = saveData;
-	  res.rows = saveRows;
-	 // $scope.paragraph.result = res;
-	  $scope.setGraphMode(type, emit, refresh);
-	  
+	  var result = $scope.paragraph.result;
+	  var filteredMsgTable = [];
+	  var filteredRows= [];
+	  var k = 0;
+	  for(var i = 0; i < result.msgTable.length; i++){
+		  for(var j = 0; j < result.msgTable[i].length; j++){
+			  if(result.msgTable[i][j].value === filteredValue){
+				  filteredMsgTable[k] = result.msgTable[i]; 
+				  filteredRows[k] = result.rows[i];
+				  k++;
+				  break; //for the first time we filter one value
+			  }
+		  }  
+	  }
+	  //if the paragraph doesn't contain the filter value but have the column name, "no data available"
+	  //will be print at screen
+	  result.msgTable = filteredMsgTable;
+	  result.rows = filteredRows;
+	  $scope.setGraphMode(type, emit, refresh);  
   };
   
-
+  
   var setD3Chart = function(type, data, refresh) {
 	
 	  if (!$scope.chart[type]) {
-      var chart = nv.models[type]();
-      $scope.chart[type] = chart;
-    }
+		  var chart = nv.models[type]();
+		  $scope.chart[type] = chart;
+	  }
   
     var d3g = [];
     var xLabels;
@@ -1373,7 +1386,7 @@ angular.module('zeppelinWebApp')
       $scope.chart[type].yAxis.tickFormat(function(d) {return xAxisTickFormat(d, yLabels);});
       $scope.chart[type].scatter.dispatch.on('elementClick', function(d){
     	  index = d.pointIndex;
-    	  $scope.allParagraphFiltered(false,  false, xLabels[index], d.point.y);
+    	  $scope.allParagraphFiltered(false,  false, $scope.paragraph.config.graph.keys[0].name, xLabels[index]);
        });
       
       // configure how the tooltip looks.
@@ -1401,67 +1414,56 @@ angular.module('zeppelinWebApp')
           .y(function(d) { return d.value;});
         
         $scope.chart[type].pie.dispatch.on('elementClick', function(d){
-            $scope.allParagraphFiltered(false,  false, d.label, d.value);
-        });
-        var test = d3.select('#p'+$scope.paragraph.id+'_'+type+' svg');
-        
+            $scope.allParagraphFiltered(false,  false, $scope.paragraph.config.graph.keys[0].name, d.label);
+        });        
 
         if ( d.length > 0 ) {
           for ( var i=0; i<d[0].values.length ; i++) {
             var e = d[0].values[i];
-
-              
             d3g.push({
               label : e.x,
               value : e.y
             });
           }
         }
-       
-        
       } else if (type === 'multiBarChart') {
-
-        d3g = pivotDataToD3ChartFormat(p, true, false, type).d3g;
-       
-       
-        $scope.chart[type].yAxis.axisLabelDistance(50);
-        $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
-       //filter when clicked on graph
-        $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
-        	$scope.allParagraphFiltered(false,  false, d.point.x, d.value);
-        });
+    	  d3g = pivotDataToD3ChartFormat(p, true, false, type).d3g;
+    	  $scope.chart[type].yAxis.axisLabelDistance(50);
+    	  $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
+    	  //filter when clicked on graph
+    	  $scope.chart[type].multibar.dispatch.on('elementClick', function(d){
+    		  $scope.allParagraphFiltered(false,  false, $scope.paragraph.config.graph.keys[0].name, d.point.x);
+    	  });
       } else if (type === 'lineChart' || type === 'stackedAreaChart' || type === 'lineWithFocusChart') {
     	  
-        var pivotdata = pivotDataToD3ChartFormat(p, false, true);
-        xLabels = pivotdata.xLabels;
-        d3g = pivotdata.d3g;
-        $scope.chart[type].xAxis.tickFormat(function(d) {return xAxisTickFormat(d, xLabels);});
-        $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
-        $scope.chart[type].yAxis.axisLabelDistance(50);
-        if ($scope.chart[type].useInteractiveGuideline) { // lineWithFocusChart hasn't got useInteractiveGuideline
-          $scope.chart[type].useInteractiveGuideline(true); // for better UX and performance issue. (https://github.com/novus/nvd3/issues/691)
-        }
+    	  var pivotdata = pivotDataToD3ChartFormat(p, false, true);
+    	  xLabels = pivotdata.xLabels;
+    	  d3g = pivotdata.d3g;
+    	  $scope.chart[type].xAxis.tickFormat(function(d) {return xAxisTickFormat(d, xLabels);});
+    	  $scope.chart[type].yAxis.tickFormat(function(d) {return yAxisTickFormat(d);});
+    	  $scope.chart[type].yAxis.axisLabelDistance(50);
+    	  if ($scope.chart[type].useInteractiveGuideline) { // lineWithFocusChart hasn't got useInteractiveGuideline
+    		  $scope.chart[type].useInteractiveGuideline(true); // for better UX and performance issue. (https://github.com/novus/nvd3/issues/691)
+    	  }
    
-        
-        if($scope.paragraph.config.graph.forceY) {
-          $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
-        } else {
-          $scope.chart[type].forceY([]);
-        }
-        if(type === 'lineChart'){
-        	$scope.chart[type].lines.dispatch.on('elementClick', function(d){
-        		index = d[0].pointIndex;
-             	$scope.allParagraphFiltered(false,  false, xLabels[index], d[0].point.y);
-             });
-
-        }
-        if(type === 'stackedAreaChart'){
-        	$scope.chart[type].stacked.scatter.dispatch.on('elementClick', function(d){
-             	$scope.allParagraphFiltered(false,  false, xLabels[0]);
-             });
-
-        }
-              }
+    	  if($scope.paragraph.config.graph.forceY) {
+    		  $scope.chart[type].forceY([0]); // force y-axis minimum to 0 for line chart.
+    	  } else {
+    		  $scope.chart[type].forceY([]);
+    	  }
+    	  if(type === 'lineChart'){
+    		  $scope.chart[type].lines.dispatch.on('elementClick', function(d){
+    			  index = d[0].pointIndex;
+    			  $scope.allParagraphFiltered(false,  false, $scope.paragraph.config.graph.keys[0].name, xLabels[index]);
+    		  });
+    	  }
+    	  if(type === 'stackedAreaChart'){
+    		  //the scatter.display.on doesn't work
+    		  $scope.chart[type].stacked.scatter.dispatch.on('elementClick', function(d){
+    			  $scope.allParagraphFiltered(false,  false, $scope.paragraph.config.graph.keys[0].name,  xLabels[0]);
+    		  });
+    	  }
+      }
     }
 
     var renderChart = function() {
@@ -1763,7 +1765,7 @@ angular.module('zeppelinWebApp')
           };
         } else {
           p[valueKey] = {
-            value : aggrFunc[value.aggr](p[valueKey].value, row[value.index], p[valueKey].count+1),
+        		  value : aggrFunc[value.aggr](p[valueKey].value, row[value.index], p[valueKey].count+1),
             count : (aggrFuncDiv[value.aggr]) ?  p[valueKey].count+1 : p[valueKey].count
           };
         }

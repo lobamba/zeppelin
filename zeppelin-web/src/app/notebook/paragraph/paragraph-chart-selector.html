@@ -21,6 +21,10 @@ limitations under the License.
             ng-click="setGraphMode('table', true)" ><i class="fa fa-table"></i>
     </button>
     <button type="button" class="btn btn-default btn-sm"
+             ng-class="{'active': isGraphMode('pivot')}"
+             ng-click="setGraphMode('pivot', true)" ><i class="fa fa-table"></i>
+     </button>
+    <button type="button" class="btn btn-default btn-sm"
             ng-class="{'active': isGraphMode('multiBarChart')}"
             ng-click="setGraphMode('multiBarChart', true)"><i class="fa fa-bar-chart"></i>
     </button>
@@ -58,7 +62,7 @@ limitations under the License.
       <li ng-click="exportToDSV('\t')"><a>TSV</a></li>
     </ul>
   </span>
-  <span ng-if="getGraphMode()!='table'"
+  <span ng-if="getGraphMode()!='table' && getGraphMode()!='pivot'"
         style="margin-left:5px; cursor:pointer; display: inline-block; vertical-align:top; position: relative; line-height:30px;">
     <a class="btnText" ng-click="toggleGraphOption()">
       settings <span ng-class="paragraph.config.graph.optionOpen ? 'fa fa-caret-up' : 'fa fa-caret-down'"></span>
